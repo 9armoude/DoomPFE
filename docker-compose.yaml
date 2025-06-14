@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${GUACAMOLE_DB}
+
+  nextcloud:
+    image: vinexborsalino/nextcloud-custom
+    container_name: nextcloud_app
+    restart: always
+    ports:
+      - "0.0.0.0:8082:80"
+    volumes:
+      - ./nextcloud:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      - MYSQL_DATABASE=${NEXTCLOUD_DB}
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASS}
+      - MYSQL_HOST=mariadb
+
+  guacd:
+    image: guacamole/guacd:1.5.3
+    container_name: guacd
+    restart: always
+
+  guacamole:
+    image: guacamole/guacamole:1.5.3
+    container_name: guacamole_app
+    restart: always
+    ports:
+      - "0.0.0.0:8080:8080"
+    depends_on:
+      - guacd
+      - mariadb
+    environment:
+      - MYSQL_DATABASE=${GUACAMOLE_DB}
+      - MYSQL_USER=${GUACAMOLE_DB_USER}
+      - MYSQL_PASSWORD=${GUACAMOLE_DB_PASS}
+      - MYSQL_HOSTNAME=mariadb
+      - GUACD_HOSTNAME=guacd
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    restart: always
+    ports:
+      - "0.0.0.0:8081:80"
+    environment:
+      - PMA_HOST=mariadb
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb_data:
