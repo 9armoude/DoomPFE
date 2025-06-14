@@ -2,7 +2,7 @@ FROM nextcloud:latest
 
 # Update package list and install vim
 COPY ./estc /var/www/html/estc
-RUN chown -R www-data:www-data && chmod -R 755 /var/www/html/estc
+RUN chown -R www-data:www-data /var/www/html/estc && chmod -R 755 /var/www/html/estc
 RUN apt update && apt install -y vim
 
 # Install and enable mysqli extension
