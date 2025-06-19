@@ -28,6 +28,19 @@ services:
       - MYSQL_USER=${NEXTCLOUD_DB_USER}
       - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASS}
       - MYSQL_HOST=mariadb
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    restart: always
+    ports:
+      - "0.0.0.0:8081:80"
+    environment:
+      - PMA_HOST=mariadb
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      - mariadb
 
   guacd:
     image: guacamole/guacd:1.5.3
@@ -50,20 +63,7 @@ services:
       - MYSQL_HOSTNAME=mariadb
       - GUACD_HOSTNAME=guacd
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: pma
-    restart: always
-    ports:
-      - "0.0.0.0:8081:80"
-    environment:
-      - PMA_HOST=mariadb
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - PMA_USER=${MYSQL_USER}
-      - PMA_PASSWORD=${MYSQL_PASSWORD}
-    depends_on:
-      - mariadb
+  
 
 volumes:
   mariadb_data:
-  nextcloud_data:
